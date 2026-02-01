@@ -6,218 +6,126 @@ import {
     Database,
     Lock,
     Smartphone,
-    Play,
-    CheckCircle,
-    Loader2,
-    FileText
+    Globe,
+    FileText,
+    Search,
+    Eye,
+    Server
 } from 'lucide-react';
-import { useTrinetra } from '../context/TrinetraContext';
-import ChakraRadar from './ChakraRadar';
+import { useNavigate } from 'react-router-dom';
 
-const IndrajaalDashboard = () => {
-    const { state, runProtocol, resetProtocol } = useTrinetra();
+const TrinetraHub = () => {
+    const navigate = useNavigate();
 
-    const isRunning = state.status !== 'IDLE' && state.status !== 'COMPLETED' && state.status !== 'FAILED';
-    const isComplete = state.status === 'COMPLETED';
+    const modules = [
+        {
+            title: "INDRAJAAL",
+            subtitle: "Unified Forensics Extraction",
+            icon: <Database size={32} />,
+            color: "text-[#FFD700]",
+            border: "border-[#FFD700]/30",
+            bg: "bg-[#FFD700]/5",
+            path: "/", // Stays on home or could be a specific sub-route if needed. For now, this is the dashboard itself, maybe link to a 'manage' view if existed.
+            description: "ADB Bridge & Artifact Extraction Engine"
+        },
+        {
+            title: "SUDARSHANA",
+            subtitle: "Threat Defense Matrix",
+            icon: <ShieldAlert size={32} />,
+            color: "text-[#FF3333]",
+            border: "border-[#FF3333]/30",
+            bg: "bg-[#FF3333]/5",
+            path: "/threats",
+            description: "Real-time Malware Analysis & risk Scoring"
+        },
+        {
+            title: "KAAL CHAKRA",
+            subtitle: "Timeline Reconstruction",
+            icon: <Activity size={32} />,
+            color: "text-[#00D9FF]",
+            border: "border-[#00D9FF]/30",
+            bg: "bg-[#00D9FF]/5",
+            path: "/timeline",
+            description: "Chronological Event Mapping (SMS/Calls/GPS)"
+        },
+        {
+            title: "CHITRAGUPTA",
+            subtitle: "Automated Reporting",
+            icon: <FileText size={32} />,
+            color: "text-[#00FF41]",
+            border: "border-[#00FF41]/30",
+            bg: "bg-[#00FF41]/5",
+            path: "/reports",
+            description: "Case File Generation & Export"
+        },
+        {
+            title: "DIVYA DRISHTI",
+            subtitle: "Evidence Viewer",
+            icon: <Eye size={32} />,
+            color: "text-[#A855F7]",
+            border: "border-[#A855F7]/30",
+            bg: "bg-[#A855F7]/5",
+            path: "/viewer",
+            description: "Deep content inspection & Media analysis"
+        }
+    ];
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto min-h-full flex flex-col">
+        <div className="p-8 max-w-7xl mx-auto min-h-screen flex flex-col justify-center">
 
-            {/* HERO / PROTOCOL CONTROLLER */}
-            <div className="relative mb-8 p-1 rounded-2xl bg-gradient-to-r from-[#FF9933] via-white to-[#138808] animate-gradient-bg bg-[length:200%_200%] transition-all shadow-[0_0_50px_rgba(255,255,255,0.1)]">
-                <div className="bg-[#050508] rounded-xl p-8 flex flex-col items-center justify-center relative overflow-hidden text-center">
+            <div className="text-center mb-16">
+                <h1 className="text-6xl md:text-8xl font-display font-black tracking-widest leading-none mb-4">
+                    <span className="text-white">TRI</span>
+                    <span className="text-[#FF9933] mx-1">NET</span>
+                    <span className="text-[#138808]">RA</span>
+                </h1>
+                <p className="text-xl text-gray-400 font-mono tracking-[0.3em]">INTEGRATED FORENSIC SUITE v1.0</p>
+            </div>
 
-                    {/* Background Tech GFX */}
-                    <div className="absolute inset-0 opacity-10 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {modules.map((mod, i) => (
+                    <motion.div
+                        key={i}
+                        whileHover={{ scale: 1.02, y: -5 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => navigate(mod.path)}
+                        className={`relative group cursor-pointer p-8 rounded-2xl border ${mod.border} ${mod.bg} backdrop-blur-sm overflow-hidden`}
+                    >
+                        {/* Hover Gradient */}
+                        <div className={`absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-50 group-hover:opacity-20 transition-opacity`} />
 
-                    <h1 className="text-4xl md:text-6xl font-display font-black tracking-widest leading-none mb-2 z-10 flex flex-col md:block">
-                        <span className="text-white">TRINETRA</span>
-                        <span className="text-[#00D9FF] mx-2 text-2xl font-mono align-middle tracking-normal">MOTHER DASHBOARD</span>
-                    </h1>
-
-                    {/* STATUS INDICATOR */}
-                    <div className="flex items-center gap-4 mb-8 z-10">
-                        <div className={`flex items-center gap-2 px-4 py-1 rounded-full border ${state.status === 'IDLE' ? 'border-gray-500 text-gray-400 bg-gray-900/50' :
-                                state.status === 'FAILED' ? 'border-red-500 text-red-500 bg-red-900/50' :
-                                    isComplete ? 'border-green-500 text-green-500 bg-green-900/50' :
-                                        'border-[#00D9FF] text-[#00D9FF] bg-blue-900/50 animate-pulse'
-                            }`}>
-                            {isRunning && <Loader2 size={14} className="animate-spin" />}
-                            <span className="font-mono text-xs tracking-widest">{state.status === 'IDLE' ? 'SYSTEM READY' : state.status}</span>
-                        </div>
-                    </div>
-
-                    {/* MAIN BUTTON */}
-                    {!isRunning && !isComplete && (
-                        <button
-                            onClick={runProtocol}
-                            className="group relative px-12 py-4 bg-white text-black font-black font-display tracking-[0.2em] text-xl rounded hover:scale-105 transition-transform z-10 flex items-center gap-3 overflow-hidden"
-                        >
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#FF9933] via-white to-[#138808] opacity-0 group-hover:opacity-20 transition-opacity"></div>
-                            <Play size={24} fill="currentColor" /> INITIATE ALL PROTOCOLS
-                        </button>
-                    )}
-
-                    {isRunning && (
-                        <div className="w-full max-w-2xl z-10">
-                            <div className="flex justify-between text-xs font-mono text-[#00D9FF] mb-2">
-                                <span>TOTAL SYSTEM PROGRESS</span>
-                                <span>{state.progress}%</span>
+                        <div className="relative z-10">
+                            <div className={`mb-6 ${mod.color} p-4 rounded-full bg-white/5 w-fit`}>
+                                {mod.icon}
                             </div>
-                            <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                                <motion.div
-                                    className="h-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808]"
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${state.progress}%` }}
-                                />
+                            <h3 className={`text-2xl font-black font-display tracking-wider mb-2 text-white group-hover:${mod.color} transition-colors`}>
+                                {mod.title}
+                            </h3>
+                            <div className={`text-xs font-mono font-bold mb-4 ${mod.color} opacity-80 uppercase tracking-widest`}>
+                                {mod.subtitle}
                             </div>
-                            <div className="mt-4 h-24 overflow-y-auto bg-black/50 border border-white/10 rounded p-2 font-mono text-xs text-green-400 custom-scrollbar text-left">
-                                {state.logs.map((log, i) => (
-                                    <div key={i}>&gt; {log}</div>
-                                ))}
-                            </div>
+                            <p className="text-sm text-gray-400 font-sans leading-relaxed">
+                                {mod.description}
+                            </p>
                         </div>
-                    )}
 
-                    {isComplete && (
-                        <div className="z-10 text-center">
-                            <div className="text-green-500 text-6xl mb-4 flex justify-center"><CheckCircle size={64} /></div>
-                            <div className="text-xl text-white font-mono mb-6">ALL TASKS COMPLETED SUCCESSFULLY</div>
-                            <button onClick={resetProtocol} className="text-gray-500 hover:text-white underline text-xs font-mono">RESET SYSTEM</button>
+                        {/* Tech Decoration */}
+                        <div className="absolute top-4 right-4 text-[10px] font-mono text-gray-600 opacity-50">
+                            SYS.MOD.0{i + 1}
                         </div>
-                    )}
+                    </motion.div>
+                ))}
+            </div>
+
+            <div className="mt-16 text-center">
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-gray-500">
+                    <Server size={12} />
+                    <span>SYSTEM ONLINE // PORT 5000 CONNECTED</span>
                 </div>
             </div>
 
-            {/* LIVE WIDGETS GRID */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
-
-                {/* 1. THREAT MONITOR (SUDARSHANA) */}
-                <div className="bg-black/40 border border-white/10 rounded-xl p-4 relative overflow-hidden group">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-[#FF3333] font-display font-bold flex items-center gap-2 text-sm">
-                            <ShieldAlert size={16} /> SUDARSHANA
-                        </h3>
-                        <Activity size={14} className={isRunning ? "text-[#FF3333] animate-pulse" : "text-gray-600"} />
-                    </div>
-
-                    <div className="flex-1 flex flex-col items-center justify-center h-32">
-                        {state.threatScore > 0 ? (
-                            <>
-                                <div className="scale-50 origin-center">
-                                    <ChakraRadar threatLevel={state.threatScore > 50 ? 'high' : 'low'} isScanning={true} />
-                                </div>
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none mt-2">
-                                    <div className="text-2xl font-bold text-white">{state.threatScore}</div>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="text-center text-gray-600">
-                                <ShieldAlert size={32} className="mx-auto mb-2 opacity-20" />
-                                <div className="text-[10px] font-mono">WAITING SCAN</div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* 2. EXTRACTION STATS (INDRAJAAL) */}
-                <div className="bg-black/40 border border-white/10 rounded-xl p-4 relative overflow-hidden group">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-[#FFD700] font-display font-bold flex items-center gap-2 text-sm">
-                            <Database size={16} /> INDRAJAAL
-                        </h3>
-                        {state.deviceConnected && <Smartphone size={14} className="text-green-500" />}
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="p-3 bg-white/5 rounded border border-white/5">
-                            <div className="text-[10px] text-gray-500 mb-1">ARTIFACTS</div>
-                            <div className="text-xl font-bold text-white">{state.artifactsCount.toLocaleString()}</div>
-                        </div>
-                        <div className="p-3 bg-white/5 rounded border border-white/5">
-                            <div className="text-[10px] text-gray-500 mb-1">DEVICE</div>
-                            <div className={`text-xs font-bold font-mono ${state.deviceConnected ? 'text-green-400' : 'text-gray-500'}`}>
-                                {state.deviceConnected ? 'CONNECTED' : 'WAITING...'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 3. TIMELINE (KAAL CHAKRA) */}
-                <div className="bg-black/40 border border-white/10 rounded-xl p-4 relative overflow-hidden group">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-[#00D9FF] font-display font-bold flex items-center gap-2 text-sm">
-                            <Activity size={16} /> KAAL CHAKRA
-                        </h3>
-                    </div>
-
-                    <div className="flex-1 flex flex-col items-center justify-center p-2">
-                        {state.artifactsCount > 0 ? (
-                            <div className="w-full space-y-2">
-                                <div className="flex items-center gap-2 text-xs font-mono text-gray-400">
-                                    <span className="w-2 h-2 rounded-full bg-[#00D9FF] animate-pulse"></span>
-                                    <span>Building Timeline...</span>
-                                </div>
-                                <div className="h-24 bg-white/5 rounded p-2 overflow-hidden relative">
-                                    <div className="absolute top-0 left-4 w-[1px] h-full bg-[#00D9FF]/20"></div>
-                                    <div className="space-y-3 pl-4 pt-1">
-                                        {[1, 2, 3].map(i => (
-                                            <div key={i} className="text-[10px] text-gray-500 flex justify-between">
-                                                <span>Event_Log_{i}293</span>
-                                                <span>{new Date().toLocaleTimeString()}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="text-center text-gray-600">
-                                <Activity size={32} className="mx-auto mb-2 opacity-20" />
-                                <div className="text-[10px] font-mono">NO DATA</div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* 4. FINAL REPORT (CHITRAGUPTA) */}
-                <div className="bg-black/40 border border-white/10 rounded-xl p-4 relative overflow-hidden group flex flex-col">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-[#00FF41] font-display font-bold flex items-center gap-2 text-sm">
-                            <FileText size={16} /> CHITRAGUPTA
-                        </h3>
-                        <Lock size={14} className="text-[#00FF41]" />
-                    </div>
-
-                    <div className="flex-1 flex items-center justify-center">
-                        {isComplete ? (
-                            <motion.div
-                                initial={{ scale: 0.8, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                className="text-center w-full"
-                            >
-                                <div className="bg-[#00FF41]/10 border border-[#00FF41]/30 p-2 rounded-lg mb-2 cursor-pointer hover:bg-[#00FF41]/20 transition-colors">
-                                    <div className="flex items-center justify-center gap-2 text-[#00FF41] mb-1">
-                                        <FileText size={20} />
-                                        <span className="font-bold text-sm">CASE_FINAL.pdf</span>
-                                    </div>
-                                    <div className="text-[9px] text-gray-400">VERIFIED</div>
-                                </div>
-                                <button className="w-full py-2 bg-[#00FF41] text-black font-bold text-[10px] rounded hover:bg-white transition-colors">
-                                    DOWNLOAD
-                                </button>
-                            </motion.div>
-                        ) : (
-                            <div className="text-center text-gray-600">
-                                <FileText size={32} className="mx-auto mb-2 opacity-20" />
-                                <div className="text-[10px] font-mono">PENDING...</div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-            </div>
         </div>
     );
 };
 
-export default IndrajaalDashboard;
+export default TrinetraHub;

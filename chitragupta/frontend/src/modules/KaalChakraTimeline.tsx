@@ -94,11 +94,11 @@ const fetchIndrajaalData = async (): Promise<ForensicEvent[]> => {
         // Sort by time
         events.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
 
-        return events.length > 0 ? events : mockIndrajaalData;
+        return events;
 
     } catch (e) {
-        console.warn("Failed to fetch from Indrajaal Backend, using mock data.", e);
-        return mockIndrajaalData;
+        console.warn("Failed to fetch from Indrajaal Backend.", e);
+        return []; // Return empty array solely, NO SIMULATION
     }
 };
 
