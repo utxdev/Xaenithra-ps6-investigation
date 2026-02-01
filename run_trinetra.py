@@ -63,38 +63,36 @@ def main():
     print("\n[STEP 2/4] Checking Frontend Dependencies...")
     install_node_deps(frontend_dir)
     
-    # 2. Launch Services
-    print("\n[STEP 3/4] Launching Services...")
+    # UNIFIED BACKEND (Runs Indrajaal, Sudarshana, Chitragupta together)
+    print(" [+] Launching Unified Backend Server...")
     
-    # Indrajaal
-    print(" [+] Starting Indrajaal (Extraction Engine)...")
-    open_terminal(f"{sys.executable} main.py --gui", "Trinetra: Indrajaal Core", inderjaal_dir)
+    # 1. Install Dependencies First (ensure they exist)
+    print("     - Checking dependencies...")
+    install_dependencies(os.path.join(base_dir, "Inderjaal", "backend"))
+    install_dependencies(os.path.join(base_dir, "Sudarshana", "backend"))
+    install_node_deps(os.path.join(base_dir, "chitragupta", "backend"))
+
+    # 2. Run Unified Script
+    open_terminal(f"{sys.executable} run_unified_backend.py", "Trinetra: Unified Backend Services", base_dir)
+
+    # 3. Frontend (UI)
+    chitragupta_frontend = os.path.join(base_dir, "chitragupta", "frontend")
+    install_node_deps(chitragupta_frontend)
     
-    # Sudarshana
-    print(" [+] Starting Sudarshana (Threat Engine)...")
-    open_terminal(f"{sys.executable} main.py", "Trinetra: Sudarshana Core", sudarshana_dir)
-
-    # Chitragupta Backend (Pipeline Engine)
-    print(" [+] Starting Chitragupta Engine (Reporting)...")
-    chitragupta_backend = os.path.join(base_dir, "chitragupta", "backend")
-    install_node_deps(chitragupta_backend) # Install TS/Node deps
-    # Use npx ts-node to run typescript file
-    ts_cmd = "npx.cmd ts-node src/server.ts" if platform.system() == "Windows" else "npx ts-node src/server.ts"
-    open_terminal(ts_cmd, "Trinetra: Chitragupta Core", chitragupta_backend)
-
-    # Frontend (Use system specific npm)
+    print(" [+] Launching Trinetra Interface...")
     npm_run = "npm.cmd run dev" if platform.system() == "Windows" else "npm run dev"
-    print(" [+] Starting Chitragupta (Interface)...")
-    open_terminal(npm_run, "Trinetra: Interface", frontend_dir)
-    
-    # 3. Open Browser
+    open_terminal(npm_run, "Trinetra: Interface", chitragupta_frontend)
+
+    print("\n[SUCCESS] System Launched.")
+    print("   - Window 1: Unified Backend (Indrajaal, Sudarshana, Chitragupta)")
+    print("   - Window 2: Trinetra Interface (Frontend)")
+    print("\nAccess the Hub at: http://localhost:8080")
     print("\n[STEP 4/4] Opening Dashboard...")
     print("Wait for frontend to compile (approx 5-10s)...")
     time.sleep(8)
     webbrowser.open("http://localhost:8080")
     
     print("\n[SUCCESS] Trinetra is running.")
-    print("Press Enter to exit this launcher (services will keep running).")
     input()
 
 if __name__ == "__main__":
