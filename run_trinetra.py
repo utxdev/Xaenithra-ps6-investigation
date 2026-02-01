@@ -73,7 +73,15 @@ def main():
     # Sudarshana
     print(" [+] Starting Sudarshana (Threat Engine)...")
     open_terminal(f"{sys.executable} main.py", "Trinetra: Sudarshana Core", sudarshana_dir)
-    
+
+    # Chitragupta Backend (Pipeline Engine)
+    print(" [+] Starting Chitragupta Engine (Reporting)...")
+    chitragupta_backend = os.path.join(base_dir, "chitragupta", "backend")
+    install_node_deps(chitragupta_backend) # Install TS/Node deps
+    # Use npx ts-node to run typescript file
+    ts_cmd = "npx.cmd ts-node src/server.ts" if platform.system() == "Windows" else "npx ts-node src/server.ts"
+    open_terminal(ts_cmd, "Trinetra: Chitragupta Core", chitragupta_backend)
+
     # Frontend (Use system specific npm)
     npm_run = "npm.cmd run dev" if platform.system() == "Windows" else "npm run dev"
     print(" [+] Starting Chitragupta (Interface)...")
