@@ -46,12 +46,16 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<TrinetraLayout />}>
+            {/* FORCE INDEX TO BE HUB */}
             <Route index element={<IndrajaalDashboard />} />
+
             <Route path="extraction" element={<IndrajaalExtraction />} />
             <Route path="timeline" element={<KaalChakraTimeline />} />
             <Route path="threats" element={<SudarshanaDashboard />} />
             <Route path="viewer" element={<DivyaDrishtiViewer />} />
             <Route path="reports" element={<ChitraguptaReports />} />
+
+            {/* HARD REDIRECT FAILSAFE: Any unknown route goes to Hub */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
