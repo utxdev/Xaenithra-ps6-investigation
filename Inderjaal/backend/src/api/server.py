@@ -602,7 +602,8 @@ def auto_extraction_job():
 scheduler.add_job(auto_extraction_job, 'interval', seconds=30)
 
 def run_server():
-    app.run(port=5000, debug=False, use_reloader=False) # use_reloader=False to prevent double scheduler
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
 
 if __name__ == '__main__':
     run_server()
