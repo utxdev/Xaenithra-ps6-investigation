@@ -14,16 +14,18 @@ We have included a unified launcher for Windows.
     cd Xaenithra-ps6-investigation
     ```
 
-2.  **Run the System**
-    Double-click **`start_trinetra.bat`**.
+2.  **Run the System (Universal)**
+    ```bash
+    python run_trinetra.py
+    ```
+    *(Works on Windows, macOS, and Linux)*
 
     *This script will automatically:*
-    *   Install Python dependencies for both backends.
-    *   Install Node.js dependencies for the frontend.
-    *   Launch Indrajaal (Extraction Engine) on Port 5000.
-    *   Launch Sudarshana (Threat Engine) on Port 8000.
-    *   Launch the Frontend on Port 8080.
+    *   Install all Python & Node dependencies.
+    *   Launch all 3 required terminals (Extraction, Threat Engine, UI).
     *   Open your browser to the Dashboard.
+
+    *Note for Windows Users: You can still double-click `start_trinetra.bat` if you prefer.*
 
 ---
 
