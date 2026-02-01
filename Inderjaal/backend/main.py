@@ -40,9 +40,11 @@ def main():
         # Auto connect if possible
         connected = connector.connect()
 
-    if not connected:
+    if not connected and not args.gui:
         logger.error("Could not establish connection to any device. Exiting.")
         return
+    elif not connected and args.gui:
+        logger.warning("No device connected at startup. GUI mode will start in detached state.")
 
     if args.info:
         info = connector.get_device_info()
