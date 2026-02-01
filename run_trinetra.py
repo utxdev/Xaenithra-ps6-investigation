@@ -6,9 +6,29 @@ import time
 import webbrowser
 import threading
 
+
+def get_python_cmd(path):
+    """
+    Returns the python command to use. 
+    Prioritizes venv/bin/python or venv/Scripts/python.
+    Falls back to sys.executable.
+    """
+    venv_path = os.path.join(path, "venv")
+    if os.path.exists(venv_path):
+        if platform.system() == "Windows":
+             py_path = os.path.join(venv_path, "Scripts", "python.exe")
+        else:
+             py_path = os.path.join(venv_path, "bin", "python")
+        
+        if os.path.exists(py_path):
+            return py_path
+            
+    return sys.executable
+
 def install_dependencies(path, req_file="requirements.txt"):
     print(f"[INIT] Installing dependencies for {path}...")
-    subprocess.run([sys.executable, "-m", "pip", "install", "-r", req_file], cwd=path, check=False)
+    py_cmd = get_python_cmd(path)
+    subprocess.run([py_cmd, "-m", "pip", "install", "-r", req_file], cwd=path, check=False)
 
 def install_node_deps(path):
     print(f"[INIT] Installing Node modules for {path}...")
@@ -63,36 +83,32 @@ def main():
     print("\n[STEP 2/4] Checking Frontend Dependencies...")
     install_node_deps(frontend_dir)
     
-    # UNIFIED BACKEND (Runs Indrajaal, Sudarshana, Chitragupta together)
-    print(" [+] Launching Unified Backend Server...")
+    # 2. Launch Services
+    print("\n[STEP 3/4] Launching Services...")
     
-    # 1. Install Dependencies First (ensure they exist)
-    print("     - Checking dependencies...")
-    install_dependencies(os.path.join(base_dir, "Inderjaal", "backend"))
-    install_dependencies(os.path.join(base_dir, "Sudarshana", "backend"))
-    install_node_deps(os.path.join(base_dir, "chitragupta", "backend"))
-
-    # 2. Run Unified Script
-    open_terminal(f"{sys.executable} run_unified_backend.py", "Trinetra: Unified Backend Services", base_dir)
-
-    # 3. Frontend (UI)
-    chitragupta_frontend = os.path.join(base_dir, "chitragupta", "frontend")
-    install_node_deps(chitragupta_frontend)
+    # Indrajaal
+    py_inderjaal = get_python_cmd(inderjaal_dir)
+    print(" [+] Starting Indrajaal (Extraction Engine)...")
+    open_terminal(f"{py_inderjaal} main.py --gui", "Trinetra: Indrajaal Core", inderjaal_dir)
     
-    print(" [+] Launching Trinetra Interface...")
+    # Sudarshana
+    py_sudarshana = get_python_cmd(sudarshana_dir)
+    print(" [+] Starting Sudarshana (Threat Engine)...")
+    open_terminal(f"{py_sudarshana} main.py", "Trinetra: Sudarshana Core", sudarshana_dir)
+    
+    # Frontend (Use system specific npm)
     npm_run = "npm.cmd run dev" if platform.system() == "Windows" else "npm run dev"
-    open_terminal(npm_run, "Trinetra: Interface", chitragupta_frontend)
-
-    print("\n[SUCCESS] System Launched.")
-    print("   - Window 1: Unified Backend (Indrajaal, Sudarshana, Chitragupta)")
-    print("   - Window 2: Trinetra Interface (Frontend)")
-    print("\nAccess the Hub at: http://localhost:8080")
+    print(" [+] Starting Chitragupta (Interface)...")
+    open_terminal(npm_run, "Trinetra: Interface", frontend_dir)
+    
+    # 3. Open Browser
     print("\n[STEP 4/4] Opening Dashboard...")
     print("Wait for frontend to compile (approx 5-10s)...")
     time.sleep(8)
     webbrowser.open("http://localhost:8080")
     
     print("\n[SUCCESS] Trinetra is running.")
+    print("Press Enter to exit this launcher (services will keep running).")
     input()
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ const SealAnimation: React.FC = () => {
                 {/* The Seal Body */}
                 <div className="w-64 h-64 bg-red-700 rounded-full border-8 border-red-900 shadow-[inset_0_0_20px_rgba(0,0,0,0.5),0_0_30px_rgba(255,0,0,0.3)] flex items-center justify-center p-8">
                     <div className="w-full h-full border-4 border-red-900/50 rounded-full flex flex-col items-center justify-center text-red-900 border-double">
-                        <span className="mythic-font text-5xl mb-2">KARMA</span>
+                        <span className="font-display text-5xl mb-2">KARMA</span>
                         <div className="w-full h-[2px] bg-red-900/30 my-1" />
                         <span className="font-serif italic text-xl">SEALED</span>
                         <span className="text-[10px] mt-2 tracking-widest">CHAIN OFFICE OF CUSTODY</span>
@@ -41,7 +41,7 @@ const SealAnimation: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="absolute bottom-20 text-amber-500 mythic-font text-2xl tracking-[10px] glow-text"
+                className="absolute bottom-20 text-amber-500 font-display text-2xl tracking-[10px] glow-text"
             >
                 INTEGRITY PRESERVED
             </motion.div>

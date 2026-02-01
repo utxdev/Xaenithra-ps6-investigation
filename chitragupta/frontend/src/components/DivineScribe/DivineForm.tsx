@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Clipboard, Shield, UserX, MessageSquare } from 'lucide-react';
+import { User, Clipboard, Shield, UserX, MessageSquare, Lock } from 'lucide-react';
 
 interface DivineFormProps {
     metadata: any;
@@ -13,7 +13,7 @@ const DivineForm: React.FC<DivineFormProps> = ({ metadata, setMetadata }) => {
 
     return (
         <div className="w-full space-y-6">
-            <h3 className="text-amber-500 text-lg mythic-font border-b border-amber-500/20 pb-2 flex items-center gap-2">
+            <h3 className="text-amber-500 text-lg font-sans border-b border-amber-500/20 pb-2 flex items-center gap-2">
                 <Clipboard size={18} /> INVESTIGATION METADATA
             </h3>
             <div className="grid grid-cols-2 gap-4">
@@ -84,5 +84,3 @@ const DivineForm: React.FC<DivineFormProps> = ({ metadata, setMetadata }) => {
 };
 
 export default DivineForm;
-
-import { Lock } from 'lucide-react';

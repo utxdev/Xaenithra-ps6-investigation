@@ -1,37 +1,36 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import TrinetraLayout from './Layout';
-import IndrajaalDashboard from './modules/IndrajaalDashboard';
-import IndrajaalExtraction from './modules/IndrajaalExtraction';
-import KaalChakraTimeline from './modules/KaalChakraTimeline';
-import SudarshanaDashboard from './modules/SudarshanaDashboard';
-import DivyaDrishtiViewer from './modules/DivyaDrishtiViewer';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HashRouter, Routes, Route } from "react-router-dom";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
+import IndrajaalExtraction from "./pages/IndrajaalExtraction";
+import KaalChakraTimeline from "./pages/KaalChakraTimeline";
+import SudarshanaDashboard from "./pages/SudarshanaDashboard";
+import DivyaDrishtiViewer from "./pages/DivyaDrishtiViewer";
+import ChitraguptaDashboard from "./components/DivineScribe/ChitraguptaDashboard";
 
-import ChitraguptaReports from './modules/ChitraguptaReports';
-import { TrinetraProvider } from './context/TrinetraContext';
+const queryClient = new QueryClient();
 
-function App() {
-  return (
-    <TrinetraProvider>
-      <BrowserRouter>
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <HashRouter>
         <Routes>
-          <Route path="/" element={<TrinetraLayout />}>
-            {/* FORCE INDEX TO BE HUB */}
-            <Route index element={<IndrajaalDashboard />} />
-
-            <Route path="extraction" element={<IndrajaalExtraction />} />
-            <Route path="timeline" element={<KaalChakraTimeline />} />
-            <Route path="threats" element={<SudarshanaDashboard />} />
-            <Route path="viewer" element={<DivyaDrishtiViewer />} />
-            <Route path="reports" element={<ChitraguptaReports />} />
-
-            {/* HARD REDIRECT FAILSAFE: Any unknown route goes to Hub */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
+          <Route path="/" element={<Index />} />
+          <Route path="/indrajaal" element={<IndrajaalExtraction />} />
+          <Route path="/kaal-chakra" element={<KaalChakraTimeline />} />
+          <Route path="/sudarshana" element={<SudarshanaDashboard />} />
+          <Route path="/divya-drishti" element={<DivyaDrishtiViewer />} />
+          <Route path="/chitragupta" element={<ChitraguptaDashboard />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TrinetraProvider>
-  );
-}
+      </HashRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;

@@ -29,8 +29,8 @@ const EvidenceSelector: React.FC<EvidenceSelectorProps> = ({ selections, setSele
                         key={cat.id}
                         onClick={() => toggle(cat.id)}
                         className={`p-3 rounded border cursor-pointer transition-all flex items-center gap-3 ${selections[cat.id]
-                                ? 'bg-amber-600/20 border-amber-500 text-white shadow-[0_0_10px_rgba(217,119,6,0.2)]'
-                                : 'bg-black/40 border-white/5 text-white/40 grayscale hover:grayscale-0'
+                            ? 'bg-amber-600/20 border-amber-500 text-white shadow-[0_0_10px_rgba(217,119,6,0.2)]'
+                            : 'bg-black/40 border-white/5 text-white/40 grayscale hover:grayscale-0'
                             }`}
                     >
                         <div className={`p-2 rounded-full ${selections[cat.id] ? 'bg-amber-500 text-black' : 'bg-white/5'}`}>

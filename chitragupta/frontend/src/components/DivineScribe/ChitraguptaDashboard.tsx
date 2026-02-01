@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { Lock, CheckCircle, Download, FileArchive } from 'lucide-react';
+import { Lock, CheckCircle, Download, FileArchive, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import DivineForm from './DivineForm';
 import EvidenceSelector from './EvidenceSelector';
 import SealAnimation from './SealAnimation';
 import ScrollReport from './ScrollReport';
 import axios from 'axios';
+import config from '../../config';
 
 const ChitraguptaDashboard: React.FC = () => {
+    const navigate = useNavigate();
     const [step, setStep] = useState<'form' | 'sealing' | 'done'>('form');
     const [metadata, setMetadata] = useState({
         case_id: '',
@@ -39,40 +42,48 @@ const ChitraguptaDashboard: React.FC = () => {
             "Executing Karma Seal (RSA-4096)...",
             "Packaging Evidence Stream..."
         ];
+
+        // Mock backend for now, replace with:
+        // const res = await axios.post(`${config.CHITRAGUPTA_API}/api/chitragupta/generate`, { ... });
         setLogs(mockLogs);
 
-        try {
-            const res = await axios.post('http://localhost:8000/api/chitragupta/generate', {
-                ...metadata,
-                selections
-            });
-            setResult(res.data);
-            setTimeout(() => {
-                if (!isAnimationDone) {
-                    setStep('done');
+        setTimeout(() => {
+            setResult({
+                report_url: `${config.CHITRAGUPTA_API}/reports/CASE-FAILED-REPORT.pdf`,
+                extras: {
+                    timeline: [
+                        { type: 'user', timestamp: '2025-01-12 10:45:00', description: 'SMS Log Extraction Complete' },
+                        { type: 'network', timestamp: '2025-01-12 10:45:05', description: 'Malicious IP Traffic Detected' }
+                    ]
                 }
-            }, 15000);
-        } catch (e) {
-            console.error(e);
-            setStep('form');
-        }
+            });
+            if (!isAnimationDone) {
+                // Wait for scroll
+            }
+        }, 3000);
     };
 
     const handleScrollComplete = () => {
         setIsAnimationDone(true);
-        if (result || step === 'sealing') {
-            setTimeout(() => setStep('done'), 1000);
-        }
+        setTimeout(() => setStep('done'), 1000);
     };
 
     return (
-        <div className="h-full w-full p-6 flex flex-col items-center overflow-y-auto bg-black/40">
-            <h1 className="text-4xl text-amber-500 mythic-font glow-text mb-6">
+        <div className="h-screen w-full p-6 flex flex-col items-center overflow-y-auto bg-[#050A18] text-white">
+            {/* Background Ambience matches Trinetra */}
+            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-950/20 via-[#050A18] to-[#050A18] pointer-events-none -z-10" />
+
+            {/* Back Button */}
+            <button onClick={() => navigate('/')} className="absolute top-6 left-6 flex items-center gap-2 text-amber-500 hover:text-amber-400 transition-colors">
+                <ArrowLeft size={20} /> <span className="text-xs uppercase tracking-widest">Back to Dashboard</span>
+            </button>
+
+            <h1 className="text-4xl text-amber-500 font-display glow-text mb-6 mt-4">
                 CHITRAGUPTA <span className="text-sm font-sans text-amber-200/50 tracking-widest ml-4">DIVINE SCRIBE</span>
             </h1>
 
             {step === 'form' && (
-                <div className="cyber-panel p-8 max-w-4xl w-full flex flex-col gap-10 border-amber-500/30">
+                <div className="border border-amber-500/30 bg-black/40 p-8 max-w-4xl w-full flex flex-col gap-10 rounded-xl backdrop-blur-sm">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                         <DivineForm metadata={metadata} setMetadata={setMetadata} />
                         <EvidenceSelector selections={selections} setSelections={setSelections} />
@@ -95,15 +106,16 @@ const ChitraguptaDashboard: React.FC = () => {
             {step === 'sealing' && (
                 <>
                     <SealAnimation />
-                    <div className="mt-20 w-full max-w-2xl">
+                    <div className="mt-20 w-full max-w-2xl text-center">
+                        {/* Scroll Report Mockup */}
                         <ScrollReport lines={logs} onComplete={handleScrollComplete} />
                     </div>
                 </>
             )}
 
             {step === 'done' && result && (
-                <div className="w-full max-w-5xl space-y-6">
-                    <div className="cyber-panel border-amber-500/20 bg-gradient-to-r from-amber-950/20 to-transparent flex flex-col md:flex-row items-center justify-between p-8 gap-8">
+                <div className="w-full max-w-5xl space-y-6 pb-20">
+                    <div className="border border-amber-500/20 bg-gradient-to-r from-amber-950/20 to-transparent flex flex-col md:flex-row items-center justify-between p-8 gap-8 rounded-xl">
                         <div className="text-left w-full md:w-2/3">
                             <h2 className="text-3xl text-amber-100 font-serif mb-2">Forensic Report</h2>
                             <p className="text-amber-500/80 font-mono text-lg uppercase tracking-wider">{metadata.case_id}</p>
@@ -129,8 +141,8 @@ const ChitraguptaDashboard: React.FC = () => {
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`flex-1 py-3 px-6 rounded text-xs uppercase tracking-[3px] transition-all ${activeTab === tab
-                                        ? 'bg-amber-600 text-black font-bold shadow-lg'
-                                        : 'text-amber-500/50 hover:bg-white/5 hover:text-amber-500'
+                                    ? 'bg-amber-600 text-black font-bold shadow-lg'
+                                    : 'text-amber-500/50 hover:bg-white/5 hover:text-amber-500'
                                     }`}
                             >
                                 {tab}
@@ -138,7 +150,7 @@ const ChitraguptaDashboard: React.FC = () => {
                         ))}
                     </div>
 
-                    <div className="cyber-panel min-h-[400px] border-amber-500/10 bg-black/30 p-8">
+                    <div className="border border-amber-500/10 bg-black/30 p-8 rounded-xl min-h-[400px]">
                         {activeTab === 'summary' && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
                                 <h3 className="text-xl text-amber-500 font-serif border-l-4 border-amber-500 pl-4">Executive Summary</h3>
@@ -211,7 +223,7 @@ const ChitraguptaDashboard: React.FC = () => {
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                                                 <div className="flex items-center gap-3">
                                                     <span className={`text-[10px] px-2 py-0.5 rounded uppercase font-bold ${event.type === 'user' ? 'bg-green-600' :
-                                                            event.type === 'network' ? 'bg-blue-600' : 'bg-amber-700'
+                                                        event.type === 'network' ? 'bg-blue-600' : 'bg-amber-700'
                                                         }`}>
                                                         {event.type}
                                                     </span>

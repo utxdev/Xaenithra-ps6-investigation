@@ -35,11 +35,7 @@ start "Indrajaal Core (:5000)" cmd /k "cd Inderjaal\backend && python -m pip ins
 echo [+] Launching Sudarshana Network (Threat Engine)...
 start "Sudarshana Core (:8000)" cmd /k "cd Sudarshana\backend && python -m pip install -r requirements.txt && python main.py"
 
-:: 5. Start Chitragupta Engine (Backend 3)
-echo [+] Launching Chitragupta Engine (Reporting)...
-start "Chitragupta Core (:3001)" cmd /k "cd chitragupta\backend && npm install && npx ts-node src/server.ts"
-
-:: 6. Start Frontend
+:: 5. Start Frontend
 echo [+] Launching Chitragupta Interface (UI)...
 echo     (This may take a moment to compile...)
 cd chitragupta\frontend
