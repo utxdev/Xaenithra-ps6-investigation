@@ -25,7 +25,7 @@ const TrinetraHub = () => {
             color: "text-[#FFD700]",
             border: "border-[#FFD700]/30",
             bg: "bg-[#FFD700]/5",
-            path: "/", // Stays on home or could be a specific sub-route if needed. For now, this is the dashboard itself, maybe link to a 'manage' view if existed.
+            path: "/extraction", // Points to new dedicated extraction module
             description: "ADB Bridge & Artifact Extraction Engine"
         },
         {

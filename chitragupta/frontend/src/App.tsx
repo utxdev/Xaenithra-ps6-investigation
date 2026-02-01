@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import TrinetraLayout from './Layout';
 import IndrajaalDashboard from './modules/IndrajaalDashboard';
+import IndrajaalExtraction from './modules/IndrajaalExtraction';
 import KaalChakraTimeline from './modules/KaalChakraTimeline';
 import SudarshanaDashboard from './modules/SudarshanaDashboard';
 import DivyaDrishtiViewer from './modules/DivyaDrishtiViewer';
@@ -46,6 +47,7 @@ function App() {
         <Routes>
           <Route path="/" element={<TrinetraLayout />}>
             <Route index element={<IndrajaalDashboard />} />
+            <Route path="extraction" element={<IndrajaalExtraction />} />
             <Route path="timeline" element={<KaalChakraTimeline />} />
             <Route path="threats" element={<SudarshanaDashboard />} />
             <Route path="viewer" element={<DivyaDrishtiViewer />} />

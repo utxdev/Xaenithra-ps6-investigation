@@ -35,39 +35,47 @@ const SudarshanaDashboard: React.FC = () => {
             }
         } catch (e) {
             console.error(e);
-            // Mock for UI Demo if backend unavailable
-            setExtractionStatus({ status: 'starting', message: 'Initiating Mock Protocol...' });
-            setTimeout(() => setExtractionStatus({ status: 'extracting', message: 'Extracting Artifacts...' }), 1000);
-            setTimeout(() => setExtractionStatus({ status: 'completed', message: 'Extraction Complete' }), 3000);
+            // Fallback if backend is not reachable for demo, but user wants STRICT real data
+            alert("Error: Sudarshana Backend Disconnected. Cannot start extraction.");
         }
     };
 
-    // Simulate WebSocket for Demo
+    // Connect to Sudarshana Backend via WebSocket for Real-Time Analysis
     useEffect(() => {
-        const interval = setInterval(() => {
-            setStatus((prev: any) => ({
-                ...prev,
-                threat_score: prev.threat_score > 0 ? prev.threat_score : Math.floor(Math.random() * 20),
-                device_connected: true,
-                total_scanned: (prev.total_scanned || 0) + Math.floor(Math.random() * 5),
-                analysis_log: [
-                    { type: 'NET_SCAN', timestamp: new Date().toLocaleTimeString(), detail: 'Port 80 traffic normal', status: 'SECURE', risk: 'LOW' },
-                    ...prev.analysis_log
-                ].slice(0, 50)
-            }));
-        }, 2000);
+        let ws: WebSocket;
 
-        /* 
-        const ws = new WebSocket('ws://localhost:8000/ws/sudarshana');
-        ws.onopen = () => console.log('Connected to Sudarshana Net');
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            setStatus(data);
+        const connectWs = () => {
+            ws = new WebSocket('ws://localhost:8000/ws/sudarshana');
+
+            ws.onopen = () => {
+                console.log('Connected to Sudarshana Threat Net');
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    // Update state with real data from backend
+                    setStatus(data);
+                } catch (e) {
+                    console.error("Failed to parse Sudarshana WS packet", e);
+                }
+            };
+
+            ws.onerror = (e) => {
+                console.warn("Sudarshana WS Error (Backend likely starting...)", e);
+            };
+
+            ws.onclose = () => {
+                // Simple reconnect logic
+                setTimeout(connectWs, 3000);
+            };
         };
-        setSocket(ws);
-        return () => ws.close();
-        */
-        return () => clearInterval(interval);
+
+        connectWs();
+
+        return () => {
+            if (ws) ws.close();
+        };
     }, []);
 
     const threatLevel = status.threat_score > 50 ? 'high' : status.threat_score > 10 ? 'medium' : 'low';
@@ -100,10 +108,6 @@ const SudarshanaDashboard: React.FC = () => {
                         <Activity size={18} />
                         <span>System Active</span>
                     </div>
-                    <div className={`flex items-center gap-2 ${status.device_connected ? 'text-green-400' : 'text-red-400'}`}>
-                        <Smartphone size={18} />
-                        <span>{status.device_connected ? 'Device Linked' : 'No Device'}</span>
-                    </div>
                 </div>
             </div>
 
@@ -134,10 +138,11 @@ const SudarshanaDashboard: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Analysis Log (The Kill List) */}
+                {/* Analysis Log */}
                 <div className="flex-1 bg-black/20 border border-white/10 rounded-xl p-4 flex flex-col overflow-hidden backdrop-blur-sm">
                     <h3 className="text-[#FFD700] mb-4 flex items-center gap-2 font-display font-bold"><Activity size={16} /> LIVE ANALYSIS LOG</h3>
                     <div className="flex-1 overflow-y-auto font-mono text-xs space-y-2 pr-2 custom-scrollbar">
+                        {/* Logs will come from backend */}
                         {status.analysis_log?.map((item: any, i: number) => (
                             <div key={`log-${i}`} className={`p-2 border-l-2 ${item.risk === 'CRITICAL' ? 'border-red-600 bg-red-900/20' :
                                 item.risk === 'HIGH' ? 'border-orange-500 bg-orange-900/20' :
@@ -158,7 +163,7 @@ const SudarshanaDashboard: React.FC = () => {
                         ))}
 
                         {/* Fallback empty state */}
-                        {(!status.analysis_log?.length) && <div className="text-center text-white/30 mt-10">Initializing Analyst Module...<br />(Connecting to Sudarshana Core...)</div>}
+                        {(!status.analysis_log?.length) && <div className="text-center text-white/30 mt-10">Waiting for Sudarshana Node Response...</div>}
                     </div>
                 </div>
             </div>

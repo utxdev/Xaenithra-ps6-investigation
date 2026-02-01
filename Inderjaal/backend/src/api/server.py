@@ -316,60 +316,12 @@ def analyze_threats():
         "status": "SECURE" if threat_score < 20 else "NARROW_THREAT" if threat_score < 50 else "CRITICAL"
     })
 
-@app.route('/api/analyze', methods=['GET'])
-def analyze_threats():
-    """
-    Performs a basic static analysis on extracted artifacts to generate a 'Real' Threat Score.
-    Scans SMS and Files for keywords.
-    """
-    threat_score = 0
-    threat_findings = []
-    
-    KEYWORDS = ["otp", "password", "bank", "urgent", "verify", "account", "blocked", "suspicious", "hack", "won", "lottery"]
-    
-    # Analyze SMS
-    sms_file = "sms_messages.json"
-    if os.path.exists(sms_file):
-        try:
-            with open(sms_file, 'r') as f:
-                msgs = json.load(f)
-                for m in msgs:
-                    body = m.get('body', '').lower()
-                    for k in KEYWORDS:
-                        if k in body:
-                            threat_score += 5
-                            threat_findings.append(f"SMS Threat [{k}]: {m.get('address')}")
-                            break
-        except Exception as e:
-            logger.error(f"Analysis error (SMS): {e}")
-
-    # Analyze Apps (Simulated check for 'malware' names)
-    app_file = "app_data.json"
-    if os.path.exists(app_file):
-        try:
-            with open(app_file, 'r') as f:
-                apps = json.load(f)
-                for a in apps:
-                    name = a.get('name', '').lower()
-                    if "rat" in name or "spy" in name or "logger" in name:
-                         threat_score += 20
-                         threat_findings.append(f"Malware App Detected: {a.get('name')}")
-        except:
-             pass
-
-    # Cap score
-    threat_score = min(threat_score, 100)
-
-    return jsonify({
-        "score": threat_score,
-        "findings": threat_findings,
-        "status": "SECURE" if threat_score < 20 else "NARROW_THREAT" if threat_score < 50 else "CRITICAL"
-    })
-
 @app.route('/api/media_content/<path:filename>')
 def serve_media(filename):
     extract_dir = os.path.join(os.getcwd(), "extracted_media")
     return send_from_directory(extract_dir, filename)
+
+
 
 def generate_mock_data():
     """Generates random SMS and Location data for demo purposes if no device is connected or to simulate activity."""

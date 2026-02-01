@@ -10,7 +10,7 @@ const ChakraRadar: React.FC<ChakraRadarProps> = ({ threatLevel, isScanning }) =>
     const controls = useAnimation();
 
     const colors = {
-        low: '#00D9FF', // Cyan
+        low: '#00F0FF', // Cyan
         medium: '#FFD700', // Gold
         high: '#FF3333' // Red
     };
@@ -31,7 +31,7 @@ const ChakraRadar: React.FC<ChakraRadarProps> = ({ threatLevel, isScanning }) =>
     const currentColor = colors[threatLevel];
 
     return (
-        <div className="relative w-96 h-96 flex items-center justify-center scale-75 lg:scale-100">
+        <div className="relative w-96 h-96 flex items-center justify-center">
             {/* Outer Ring */}
             <motion.div
                 className="absolute inset-0 border-4 rounded-full border-dashed"
