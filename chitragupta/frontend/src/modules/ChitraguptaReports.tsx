@@ -1,141 +1,265 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { FileText, ShieldCheck, Download, Calendar, User, Hash, Lock, Stamp } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PipelineWizard } from '@/components/PipelineWizard';
+import { HashVerification } from '@/components/HashVerification';
+import { TimelineVisualization } from '@/components/TimelineVisualization';
+import { ReportGeneratorAnimation } from '@/components/ReportGeneratorAnimation';
+import { AnimatedScroll } from '@/components/AnimatedScroll';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { OmIcon, ScrollIcon, QuillIcon, SealIcon } from '@/components/icons/DivinityIcons';
+import {
+    ForensicFile,
+    ForensicReport,
+    ReportGenerationState,
+    TimelineEvent,
+    KarmaSeal as KarmaSealType
+} from '@/types/forensic';
+import { FileText, Shield, Sparkles } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import { KarmaSeal } from '@/components/KarmaSeal';
+import { toast } from 'sonner';
 
 const ChitraguptaReports = () => {
-    // Mock Data mimicking a generated report
-    const caseData = {
-        caseId: "CASE-2026-TRINETRA-001",
-        investigator: "Katana Officer",
-        date: new Date().toLocaleDateString(),
-        status: "EVIDENCE SECURED",
-        hash: "SHA-256: 7f83b165...e9a1"
+    const [files, setFiles] = useState<ForensicFile[]>([]);
+    const [caseNumber, setCaseNumber] = useState('');
+    const [examiner, setExaminer] = useState('');
+    const [report, setReport] = useState<ForensicReport | null>(null);
+    const [generationState, setGenerationState] = useState<ReportGenerationState>({
+        phase: 'idle',
+        progress: 0,
+        message: '',
+    });
+    const [showScroll, setShowScroll] = useState(false);
+    const [scrollEntries, setScrollEntries] = useState<any[]>([]);
+
+    // API Client Helper - Pipeline Backend Port
+    const API_URL = 'http://localhost:3001/api';
+
+    const handleDeviceFilePulled = useCallback((newFile: ForensicFile) => {
+        setFiles(prev => [...prev, newFile]);
+    }, []);
+
+    const generateReport = async () => {
+        if (!caseNumber || !examiner || files.length === 0) return;
+
+        setGenerationState({ phase: 'hashing', progress: 0, message: 'Initiating Divine Verification...' });
+        setShowScroll(true);
+
+        try {
+            // 1. Simulate Hashing Progress
+            for (let i = 0; i <= 100; i += 20) {
+                setGenerationState(prev => ({ ...prev, progress: i, message: `Verifying Artifact Integrity... ${i}%` }));
+                await new Promise(r => setTimeout(r, 500));
+            }
+
+            // 2. Call Backend
+            const res = await fetch(`${API_URL}/generate-report`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    fileIds: files.map(f => f.id),
+                    caseNumber,
+                    examiner
+                })
+            });
+
+            const data = await res.json();
+
+            // Check if response has error
+            if (!res.ok || data.error) {
+                console.error('Backend error:', data.error || data);
+                setGenerationState({ phase: 'idle', progress: 0, message: 'Error: ' + (data.error || 'Unknown error') });
+                toast.error('Report Generation Failed', {
+                    description: data.details || data.error || 'Unknown error'
+                });
+                return;
+            }
+
+            // Map backend response to ForensicReport format
+            const forensicReport: ForensicReport = {
+                id: data.reportId || crypto.randomUUID(),
+                caseNumber,
+                examiner,
+                createdAt: new Date(data.timestamp),
+                status: 'signed',
+                files: files,
+                merkleRoot: data.merkleRoot,
+                karmaSeal: {
+                    signature: data.signature,
+                    algorithm: data.algorithm,
+                    timestamp: new Date(data.timestamp),
+                    ntpServer: data.ntpServer,
+                    publicKeyFingerprint: data.publicKeyFingerprint,
+                    verified: true
+                },
+                timeline: []
+            };
+
+            setReport(forensicReport);
+            setGenerationState({ phase: 'complete', progress: 100, message: 'Report Generated' });
+
+        } catch (err) {
+            console.error('Report generation error:', err);
+            const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+            setGenerationState({
+                phase: 'idle',
+                progress: 0,
+                message: 'Error: ' + errorMsg
+            });
+            toast.error('Report Generation Failed', {
+                description: errorMsg + '. Check console for details.'
+            });
+        }
     };
 
-    const artifacts = [
-        { type: "SMS Database", count: 1245, status: "Verified", hash: "a1b2...c3d4" },
-        { type: "Call Logs", count: 89, status: "Verified", hash: "e5f6...g7h8" },
-        { type: "Location History", count: 450, status: "Verified", hash: "i9j0...k1l2" },
-        { type: "Threat Scan", count: 3, status: "Flagged (CRITICAL)", hash: "m3n4...o5p6" },
-        { type: "Media Files", count: 12, status: "Verified", hash: "q7r8...s9t0" },
-    ];
+    const downloadPDF = () => {
+        if (!report) return;
+        const doc = new jsPDF();
+        doc.text(`Forensic Report: ${report.id}`, 20, 20);
+        doc.text(`Case: ${report.caseNumber}`, 20, 30);
+        doc.text(`Examiner: ${report.examiner}`, 20, 40);
+        doc.text(`Merkle Root: ${report.merkleRoot}`, 20, 50);
+        if (report.karmaSeal) {
+            doc.text(`Signature: ${report.karmaSeal.signature.substring(0, 50)}...`, 20, 60);
+        }
+        doc.save(`forensic_report_${report.id}.pdf`);
+    };
 
     return (
-        <div className="h-full w-full p-8 overflow-y-auto custom-scrollbar text-white bg-[url('/grid_bg.png')] bg-fixed">
-            <div className="max-w-4xl mx-auto space-y-8">
+        <div className="min-h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/20">
 
-                {/* Header Section */}
-                <div className="text-center mb-12">
+            {/* Background Ambience */}
+            <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-950/20 via-background to-background pointer-events-none" />
+
+            <main className="container mx-auto px-4 py-8 relative z-10">
+
+                {/* Header */}
+                <header className="mb-12 text-center space-y-4">
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="inline-block"
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium"
                     >
-                        <h1 className="text-5xl font-display font-black tracking-widest mb-2">
-                            <span className="text-[#00FF41]">CHITRA</span>
-                            <span className="text-white">GUPTA</span>
-                        </h1>
-                        <p className="text-[#00FF41] font-mono spacing-widest text-sm border-t border-[#00FF41]/30 pt-2 uppercase">
-                            Automated Integrity Reporting Engine
-                        </p>
+                        <Shield className="w-4 h-4" />
+                        <span>Secure Forensic Pipeline</span>
                     </motion.div>
-                </div>
+                    <h1 className="text-5xl md:text-7xl font-display font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+                        Pipeline Project
+                    </h1>
+                    <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+                        3-Stage Evidence Acquisition System: From Cable to Court.
+                    </p>
+                </header>
 
-                {/* Report Card */}
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 relative overflow-hidden"
-                >
-                    {/* Watermark */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none">
-                        <FileText size={400} />
-                    </div>
+                {/* Main Interface */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl mx-auto">
 
-                    {/* Case Details Grid */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8 border-b border-white/10 pb-8">
-                        <div>
-                            <div className="text-xs text-gray-500 font-mono mb-1">CASE ID</div>
-                            <div className="text-[#00FF41] font-bold font-mono text-lg">{caseData.caseId}</div>
-                        </div>
-                        <div>
-                            <div className="text-xs text-gray-500 font-mono mb-1">INVESTIGATOR</div>
-                            <div className="flex items-center gap-2 text-white font-bold">
-                                <User size={14} className="text-[#FFD700]" /> {caseData.investigator}
-                            </div>
-                        </div>
-                        <div>
-                            <div className="text-xs text-gray-500 font-mono mb-1">DATE GENERATED</div>
-                            <div className="flex items-center gap-2 text-white font-bold">
-                                <Calendar size={14} className="text-[#00D9FF]" /> {caseData.date}
-                            </div>
-                        </div>
-                        <div>
-                            <div className="text-xs text-gray-500 font-mono mb-1">INTEGRITY STATUS</div>
-                            <div className="flex items-center gap-2 text-[#00FF41] font-bold animate-pulse">
-                                <ShieldCheck size={14} /> {caseData.status}
-                            </div>
-                        </div>
-                    </div>
+                    {/* Left Column: Input & Pipeline */}
+                    <div className="lg:col-span-12 space-y-6">
 
-                    {/* Artifacts Table */}
-                    <div className="mb-8">
-                        <h3 className="text-white font-display font-bold mb-4 flex items-center gap-2">
-                            <Lock size={18} className="text-[#FFD700]" />
-                            SECURED ARTIFACTS
-                        </h3>
-                        <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
-                            <table className="w-full text-left text-sm">
-                                <thead className="bg-white/5 text-gray-400 font-mono text-xs uppercase">
-                                    <tr>
-                                        <th className="p-4">Artifact Type</th>
-                                        <th className="p-4">Count</th>
-                                        <th className="p-4">Status</th>
-                                        <th className="p-4 font-mono text-right">Integrity Hash</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-white/5">
-                                    {artifacts.map((a, i) => (
-                                        <tr key={i} className="hover:bg-white/5 transition-colors">
-                                            <td className="p-4 font-semibold text-white">{a.type}</td>
-                                            <td className="p-4 text-gray-300">{a.count}</td>
-                                            <td className={`p-4 font-mono font-bold ${a.status.includes("CRITICAL") ? "text-red-500" : "text-[#00FF41]"}`}>
-                                                {a.status}
-                                            </td>
-                                            <td className="p-4 text-right font-mono text-xs text-gray-500">{a.hash}</td>
-                                        </tr>
+                        {/* Case Details */}
+                        <motion.section
+                            className="p-6 bg-card rounded-lg border border-border"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                        >
+                            <div className="flex items-center gap-2 mb-4">
+                                <QuillIcon className="w-5 h-5 text-primary" />
+                                <h2 className="font-display text-lg">Case Metadata</h2>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Input placeholder="Case Number (e.g., CF-2024-001)" value={caseNumber} onChange={e => setCaseNumber(e.target.value)} />
+                                <Input placeholder="Examiner Name" value={examiner} onChange={e => setExaminer(e.target.value)} />
+                            </div>
+                        </motion.section>
+
+                        {/* THE PIPELINE WIZARD */}
+                        <motion.section
+                            className="p-6 bg-card rounded-lg border border-border"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                        >
+                            <div className="flex items-center gap-2 mb-4">
+                                <OmIcon className="w-5 h-5 text-primary" />
+                                <h2 className="font-display text-lg">Data Acquisition Pipeline</h2>
+                            </div>
+
+                            <PipelineWizard onFilePulled={handleDeviceFilePulled} />
+                        </motion.section>
+
+                        {/* Evidence List */}
+                        {files.length > 0 && (
+                            <motion.div layout className="p-6 bg-card rounded-lg border border-border">
+                                <h3 className="font-bold mb-4">Secured Artifacts</h3>
+                                <div className="space-y-2">
+                                    {files.map(f => (
+                                        <div key={f.id} className="flex justify-between items-center bg-muted/30 p-3 rounded">
+                                            <span>{f.name}</span>
+                                            <span className="font-mono text-xs text-green-500">{f.currentHash.substring(0, 30)}...</span>
+                                        </div>
                                     ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                </div>
+                                {/* Generate Report Button - Triggers final stage */}
+                                <div className="mt-4 flex justify-end">
+                                    <Button onClick={generateReport} disabled={files.length === 0 || !caseNumber || !examiner}>
+                                        {generationState.phase === 'idle' ? 'Finalize & Sign Chain of Custody' : 'Signing...'}
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Report View */}
+                        <AnimatePresence>
+                            {report && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="p-6 bg-card rounded-lg border border-border space-y-6"
+                                >
+                                    <div className="text-center space-y-4">
+                                        <h2 className="text-2xl font-bold">Forensic Report Generated</h2>
+                                        <p className="text-muted-foreground">Report ID: {report.id}</p>
+
+                                        {report.karmaSeal && (
+                                            <div className="flex justify-center my-6">
+                                                <KarmaSeal seal={report.karmaSeal} size="lg" />
+                                            </div>
+                                        )}
+
+                                        <div className="grid grid-cols-2 gap-4 text-left bg-muted/30 p-4 rounded">
+                                            <div>
+                                                <span className="text-xs text-muted-foreground">Case Number</span>
+                                                <p className="font-semibold">{report.caseNumber}</p>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs text-muted-foreground">Examiner</span>
+                                                <p className="font-semibold">{report.examiner}</p>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs text-muted-foreground">Files Analyzed</span>
+                                                <p className="font-semibold">{report.files.length}</p>
+                                            </div>
+                                            <div>
+                                                <span className="text-xs text-muted-foreground">Merkle Root</span>
+                                                <p className="font-mono text-xs">{report.merkleRoot.substring(0, 16)}...</p>
+                                            </div>
+                                        </div>
+
+                                        <Button onClick={downloadPDF} size="lg" className="w-full">
+                                            <FileText className="w-4 h-4 mr-2" />
+                                            Download PDF Report
+                                        </Button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                     </div>
 
-                    {/* Footer / Actions */}
-                    <div className="flex justify-between items-center pt-4">
-                        <div className="text-xs text-gray-600 font-mono max-w-md">
-                            <Hash size={12} className="inline mr-1" />
-                            MASTER_HASH: {caseData.hash}
-                            <br />
-                            Digitally signed by Trinetra Forensic Suite v1.0
-                        </div>
-
-                        <button className="bg-[#00FF41] hover:bg-[#00FF41]/90 text-black font-bold py-3 px-8 rounded flex items-center gap-2 shadow-[0_0_20px_rgba(0,255,65,0.3)] hover:shadow-[0_0_30px_rgba(0,255,65,0.5)] transition-all transform hover:-translate-y-1">
-                            <Download size={20} />
-                            EXPORT PDF REPORT
-                        </button>
-                    </div>
-
-                </motion.div>
-
-                {/* Official Stamp */}
-                <div className="flex justify-center opacity-30">
-                    <div className="border-4 border-[#FFD700] text-[#FFD700] p-4 rounded-lg transform -rotate-12 font-black text-2xl tracking-widest flex items-center gap-4">
-                        <Stamp size={32} />
-                        OFFICIALLY VERIFIED
-                    </div>
                 </div>
-
-            </div>
+            </main>
         </div>
     );
 };
