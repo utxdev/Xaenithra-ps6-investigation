@@ -1,0 +1,28 @@
+services:
+  # 1. INDRAJAAL (Extraction Engine)
+  - type: web
+    name: trinetra-indrajaal
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: Inderjaal/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python src/api/server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: FLASK_ENV
+        value: production
+
+  # 2. SUDARSHANA (Threat Engine)
+  - type: web
+    name: trinetra-sudarshana
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: Sudarshana/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
