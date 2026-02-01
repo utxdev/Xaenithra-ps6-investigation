@@ -106,6 +106,10 @@ Open your browser to: **`http://localhost:8082`**
 
 ## 🚀 Deployment
 
+### ⚠️ Deployment Note
+The **Backend Services** (Indrajaal & Sudarshana) are resource-intensive and require direct hardware access (USB/ADB).
+While cloud deployment is possible for the UI, **Localhost is recommended for full functionality.**
+
 ### Public Tunneling (Demo Mode)
 To show this to clients remotely without deploying to a server:
 ```bash
