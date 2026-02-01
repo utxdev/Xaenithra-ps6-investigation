@@ -1,69 +1,139 @@
-# Trinetra Forensic Suite - Xaenithra Edition
+# 🇮🇳 TRINETRA: Digital Assembly Line
+> *The All-Seeing Eye of Digital Forensics*
 
-**Trinetra** is a unified, cyber-vedic mobile forensics platform designed for rapid extraction, timeline reconstruction, and automated threat defense.
+<div align="center">
 
-![Trinetra Hub](https://github.com/utxdev/Xaenithra-ps6-investigation/assets/placeholder.png)
+![Trinetra Dashboard](./trinetra_dashboard.png)
 
-## 🚀 Quick Start (One-Click)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](./LICENSE)
+[![React](https://img.shields.io/badge/Frontend-React_18-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![Python](https://img.shields.io/badge/Backend-Python_3.10-yellow?style=for-the-badge&logo=python)](https://www.python.org/)
+[![Vite](https://img.shields.io/badge/Build-Vite-purple?style=for-the-badge&logo=vite)](https://vitejs.dev/)
+[![Tailwind](https://img.shields.io/badge/Style-Tailwind_CSS-cyan?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 
-We have included a unified launcher for Windows.
+**The ultimate 5-Stage Digital Forensic Pipeline for Law Enforcement & Cybersecurity Professionals.**
+Inspired by ancient Vedic wisdom, built for modern cyber warfare.
 
-1.  **Clone the Repository**
-    ```bash
-    git clone https://github.com/utxdev/Xaenithra-ps6-investigation.git
-    cd Xaenithra-ps6-investigation
-    ```
+[⚡ Quick Start](#-quick-start) • [🛡️ Modules](#-divine-modules) • [📐 Architecture](#-architecture) • [🚀 Deployment](#-deployment)
 
-2.  **Run the System (Universal)**
-    ```bash
-    python run_trinetra.py
-    ```
-    *(Works on Windows, macOS, and Linux)*
-
-    *This script will automatically:*
-    *   Install all Python & Node dependencies.
-    *   Launch all 3 required terminals (Extraction, Threat Engine, UI).
-    *   Open your browser to the Dashboard.
-
-    *Note for Windows Users: You can still double-click `start_trinetra.bat` if you prefer.*
+</div>
 
 ---
 
-## 🏗️ Manual Setup
+## 🦅 Overview
 
-If you prefer to run modules manually:
+**TRINETRA** (Sanskrit: *Three Eyes*) is a state-of-the-art digital forensics suite designed to streamline the investigation lifecycle. From real-time extraction to legally admissible reporting, every stage is governed by a specialized "Divine Module".
 
-### 1. Indrajaal (Extraction Core)
-```bash
-cd Inderjaal/backend
-pip install -r requirements.txt
-python main.py --gui
+It replaces fragmented tools with a single **Digital Assembly Line**, ensuring evidence integrity through cryptographic verification (SHA-256 & RSA-4096).
+
+---
+
+## 🛡️ Divine Modules
+
+TRINETRA allows investigators to seamless flow through 5 stages of investigation:
+
+| Stage | Module Name | Divine Function | Capabilities |
+| :--- | :--- | :--- | :--- |
+| **01** | **INDRAJAAL** | *The Cosmic Net* | **Extraction Engine**. Pulls SMS, Call Logs, Contacts, and Media from Android devices via ADB. |
+| **02** | **SUDARSHANA** | *The Discus* | **Threat Intelligence**. Real-time malware scanning, packet sniffing, and "Chakra Radar" threat visualization. |
+| **03** | **KAAL CHAKRA** | *Wheel of Time* | **Timeline Analysis**. Merges all evidence (Calls, SMS, GPS) into a single interactive chronological stream. |
+| **04** | **DIVYA DRISHTI**| *Divine Vision* | **Evidence Viewer**. Sandbox for analyzing images, videos, and documents without altering metadata. |
+| **05** | **CHITRAGUPTA** | *The Scribe* | **Reporting**. Generates tamper-proof PDF reports with Chain-of-Custody verification and Karma Seals. |
+
+---
+
+## 📸 Visual Tour
+
+### 1. The Dashboard (Digital Assembly Line)
+The central command center providing instant access to all forensic modules.
+*(See banner image above)*
+
+### 2. Indrajaal (Extraction)
+Live device telemetry and one-click dump of critical partitions.
+
+### 3. Chitragupta (The Final Report)
+Automated generation of court-ready documentation.
+
+---
+
+## 📐 Architecture
+
+The system uses a **Hybrid Architecture** to ensure speed and security:
+
+- **Frontend**: React + TypeScript + Vite (Lightning fast UI)
+- **Backend / Engine**: Python (FastAPI + ADB + PyTorch for AI analysis)
+- **Communication**: REST API + WebSockets (Real-time updates)
+- **Security**: Local-first processing (Data never leaves the machine unless configured)
+
+```mermaid
+graph TD
+    A[Android Device] -->|ADB| B(Indrajaal Engine)
+    B -->|JSON/SQLite| C{TRINETRA Core}
+    C -->|Threats| D[Sudarshana]
+    C -->|Events| E[Kaal Chakra]
+    C -->|Files| F[Divya Drishti]
+    D & E & F -->|Verified Evidence| G[Chitragupta]
+    G -->|PDF Report| H[Output]
 ```
 
-### 2. Sudarshana (Threat Defense)
+---
+
+## ⚡ Quick Start
+
+### Prerequisites
+- **Python 3.10+**
+- **Node.js 18+**
+- **ADB** (`sudo apt install adb` or brew)
+
+### 1. Clone & Setup
 ```bash
-cd Sudarshana/backend
-pip install -r requirements.txt
-python main.py
+git clone https://github.com/utxdev/xaenithra-ps6-investigation.git
+cd xaenithra-ps6-investigation
 ```
 
-### 3. Chitragupta (Interface)
+### 2. Launch the Suite
+We provide a unified launcher script that starts all services:
+```bash
+# Install dependencies and run
+pip install -r requirements.txt
+python run_trinetra.py
+```
+
+### 3. Access
+Open your browser to: **`http://localhost:8082`**
+
+---
+
+## 🚀 Deployment
+
+### Public Tunneling (Demo Mode)
+To show this to clients remotely without deploying to a server:
+```bash
+cd chitragupta/frontend/deploy
+./start_tunnel.sh
+```
+*This creates a `https://trinetra-forensics.loca.lt` link accessible from anywhere.*
+
+### Production Build
+The frontend is optimized for static deployment (Vercel/Netlify/GitHub Pages):
 ```bash
 cd chitragupta/frontend
-npm install
-npm run dev
+npm run build
+# Output is in /dist
 ```
 
-**Access**: [http://localhost:8080](http://localhost:8080)
+---
 
-## 📦 Modules
+## ⚖️ Legal & Compliance
+- **Chain of Custody**: Maintained via Merkle Trees.
+- **Hashing**: All evidence is hashed (SHA-256) upon extraction.
+- **Admissibility**: Reports are designed to meet ISO/IEC 27037 guidelines for digital evidence.
 
-*   **Indrajaal**: ADB-based artifact extraction (SMS, Calls, Location).
-*   **Kaal Chakra**: Timeline visualization and correlation engine.
-*   **Sudarshana**: Real-time malware detection powered by VirusTotal.
-*   **Chitragupta**: Automated reporting and case file generation.
+---
 
-## ⚠️ Requirements
-*   Python 3.10+
-*   Node.js 18+
-*   ADB (Android Debug Bridge) installed and in PATH.
+<div align="center">
+
+**Made with 🇮🇳 for the Guardians of Cyberspace**
+*© 2025 UTXDEV Team. All Rights Reserved.*
+
+</div>
